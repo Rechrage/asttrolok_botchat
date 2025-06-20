@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>🪐 Kundli Chatbot</title>
+  <style>
+    /* Reset and base */
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #686672, #8c8491);
+      color: #eee;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+    }
+
+    header {
+      padding: 1rem;
+      text-align: center;
+      font-size: 1.8rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      background: rgba(255 255 255 / 0.1);
+      backdrop-filter: blur(5px);
+      color: #ffd700;
+      text-shadow: 0 0 6px #ffd700a0;
+    }
+
+    #chat {
+      flex-grow: 1;
+      overflow-y: auto;
+      padding: 1rem;
+      max-width: 700px;
+      width: 100%;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      scroll-behavior: smooth;
+    }
+
+    .msg {
+      max-width: 80%;
+      padding: 12px 18px;
+      border-radius: 24px;
+      font-size: 1rem;
+      line-height: 1.4;
+      box-shadow: 0 3px 8px rgb(0 0 0 / 0.15);
+      word-wrap: break-word;
+      white-space: pre-wrap;
+    }
+    .user {
+      background: #ffd700;
+      align-self: flex-end;
+      color: #222;
+      border-bottom-right-radius: 4px;
+      animation: fadeInRight 0.3s ease;
+    }
+    .bot {
+          background: #f1f2f7;
+            align-self: flex-start;
+            color: #1c7308;
+            border-bottom-left-radius: 4px;
+            animation: fadeInLeft 0.3s ease;
+    }
+
+    /* Input area */
+    #input-area {
+      max-width: 700px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 1rem;
+      background: rgba(255 255 255 / 0.05);
+      backdrop-filter: blur(5px);
+      display: flex;
+      gap: 0.75rem;
+      box-shadow: 0 -4px 12px rgb(0 0 0 / 0.25);
+    }
+    #input {
+      flex-grow: 1;
+      padding: 12px 16px;
+      border: none;
+      border-radius: 30px;
+      font-size: 1rem;
+      outline-offset: 2px;
+      outline-color: #ffd700;
+      background: rgba(255 255 255 / 0.15);
+      color: #fff;
+      transition: background-color 0.3s ease;
+    }
+    #input::placeholder {
+      color: #ddd;
+    }
+    #input:focus {
+      background: rgba(255 255 255 / 0.35);
+    }
+    #send-btn {
+      background: #ffd700;
+      border: none;
+      color: #222;
+      border-radius: 50%;
+      width: 44px;
+      height: 44px;
+      cursor: pointer;
+      font-weight: 700;
+      font-size: 1.2rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 8px #ffd700cc;
+      transition: background-color 0.3s ease;
+    }
+    #send-btn:hover {
+      background: #ffec70;
+    }
+
+    /* Responsive SVG */
+    svg {
+     width: 100%;
+       height: 90%;
+      margin-top: 0.5rem;
+      border-radius: 12px;
+      box-shadow: 0 0 10px rgb(255 215 0 / 0.3);
+      background: #fefdfd;
+    }
+
+    /* Animations */
+    @keyframes fadeInRight {
+      from {opacity: 0; transform: translateX(30px);}
+      to {opacity: 1; transform: translateX(0);}
+    }
+    @keyframes fadeInLeft {
+      from {opacity: 0; transform: translateX(-30px);}
+      to {opacity: 1; transform: translateX(0);}
+    }
+
+    /* Scrollbar for chat */
+    #chat::-webkit-scrollbar {
+      width: 8px;
+    }
+    #chat::-webkit-scrollbar-thumb {
+      background: #ffd700aa;
+      border-radius: 4px;
+    }
+
+    /* Mobile */
+    @media (max-width: 480px) {
+      #input-area {
+        padding: 0.75rem;
+      }
+      #input {
+        font-size: 0.9rem;
+        padding: 10px 14px;
+      }
+      #send-btn {
+        width: 38px;
+        height: 38px;
+        font-size: 1rem;
+      }
+      .msg {
+        max-width: 90%;
+        font-size: 0.95rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>🪐 Kundli Chatbot</header>
+
+  <div id="chat">
+    <div class="msg bot">🙏 नमस्ते! अपनी जन्म की तारीख, समय और स्थान बताइए।</div>
+  </div>
+
+  <form id="input-area" autocomplete="off">
+    <input
+      type="text"
+      id="input"
+      name="question"
+      placeholder="अपना सवाल लिखें..."
+      required
+      autofocus
+      spellcheck="false"
+      autocomplete="off"
+    />
+    <button type="submit" id="send-btn" aria-label="Send message">➡️</button>
+  </form>
+
+  <script>
+    const chat = document.getElementById('chat');
+    const form = document.getElementById('input-area');
+    const input = document.getElementById('input');
+
+    form.addEventListener('submit', async e => {
+      e.preventDefault();
+      const question = input.value.trim();
+      if (!question) return;
+
+      // Show user message
+      const userMsg = document.createElement('div');
+      userMsg.className = 'msg user';
+      userMsg.textContent = question;
+      chat.appendChild(userMsg);
+      chat.scrollTop = chat.scrollHeight;
+
+      input.value = '';
+      input.disabled = true;
+
+      try {
+        const res = await fetch('http://localhost:5000/ask', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ question }),
+          credentials: "include"
+        });
+
+        const data = await res.json();
+
+        const botMsg = document.createElement('div');
+        botMsg.className = 'msg bot';
+
+        if (data.error) {
+          botMsg.textContent = '❌ ' + data.error;
+        } else {
+          botMsg.innerHTML = `${data.message.replace(/\n/g, '<br>')}<br>${data.svg || ''}`;
+        }
+
+        chat.appendChild(botMsg);
+        chat.scrollTop = chat.scrollHeight;
+      } catch {
+        const botMsg = document.createElement('div');
+        botMsg.className = 'msg bot';
+        botMsg.textContent = '⚠️ कोई समस्या हुई। कृपया बाद में प्रयास करें।';
+        chat.appendChild(botMsg);
+        chat.scrollTop = chat.scrollHeight;
+      } finally {
+        input.disabled = false;
+        input.focus();
+      }
+    });
+  </script>
+</body>
+</html>
